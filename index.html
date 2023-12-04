@@ -3,53 +3,53 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title> Node.js File Upload </title>
+    <title>Node.js File Upload</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
 </head>
-<body>
-    <h1 class="title"> Node.js File Upload </h1>
-    <form id="uploadForm" enctype="multipart/form-data">
-        <label for="myFiles"> Select Files: </label>
-        <input type="file" id="myFiles" accept=".pdf, .docx, application/msword, application/vnd.openxmlformats-officedocument.wordprocessingml.document" multiple />
-        <button title="submitButton" type="submit" value="Upload"> Upload </button>
-    </form>
-    <h2></h2>
-    <h3></h3>
+<body class="bg-gray-100 h-screen flex items-center justify-center">
+    <div class="max-w-md w-full p-8 bg-white shadow-lg rounded-md">
+        <h1 class="text-2xl font-bold mb-4">Node.js File Upload</h1>
+        <form id="uploadForm" enctype="multipart/form-data" class="mb-4">
+            <label for="myFiles" class="block text-sm font-medium text-gray-600">Select Files:</label>
+            <input type="file" id="myFiles" accept=".pdf, .docx, application/msword, application/vnd.openxmlformats-officedocument.wordprocessingml.document" multiple class="mt-1 p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300">
+            <button type="submit" value="Upload" class="mt-4 p-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 focus:outline-none focus:ring focus:border-blue-300">Upload</button>
+        </form>
+        <h2 class="text-lg font-semibold mb-2"></h2>
+        <h3 class="text-base text-gray-600"></h3>
+    </div>
 
     <script>
-const form = document.getElementById('uploadForm');
-const sendFiles = async () => {
-    // Object
-    const myFiles = document.getElementById('myFiles').files;
-    const formData = new FormData();
+        const form = document.getElementById('uploadForm');
+        const sendFiles = async () => {
+            // Object
+            const myFiles = document.getElementById('myFiles').files;
+            const formData = new FormData();
 
-Object.keys(myFiles).forEach(key => {
-    formData.append(myFiles.item(key).name, myFiles.item(key));
-});
+            Object.keys(myFiles).forEach(key => {
+                formData.append(myFiles.item(key).name, myFiles.item(key));
+            });
 
-const response = await fetch('http://localhost:3000/upload', {
-    method: 'POST',
-    body: formData
-});
+            const response = await fetch('http://localhost:3000/upload', {
+                method: 'POST',
+                body: formData
+            });
 
+            const json = await response.json();
+            console.log(json);
 
-const json = await response.json();
-console.log(json);
+            const h2 = document.querySelector('h2');
+            h2.textContent = `Status: ${json?.status}`;
 
-const h2 = document.querySelector('h2');
-h2.textContent = `Status: ${json?.status}`;
+            const h3 = document.querySelector('h3');
+            h3.textContent = json?.message;
 
-const h3 = document.querySelector('h3');
-h3.textContent = json?.message;
+            console.log(json);
+        }
 
-console.log(json)
-}
-
-form.addEventListener('submit', (e) => {
-    e.preventDefault();
-    sendFiles();
-});
-
-
+        form.addEventListener('submit', (e) => {
+            e.preventDefault();
+            sendFiles();
+        });
     </script>
 </body>
 </html>
