@@ -1,19 +1,29 @@
+
+////////////////////////// Import modules
 const express = require('express');
 const fileUpload = require('express-fileupload');
 const path = require('path');
 const fs = require('fs');
 
+
+////////////////////////// Import middlewares
 const filesPayloadExists = require('./middleware/filesPayloadExist');
 const fileExtLimiter = require('./middleware/fileExtLimiter');
 const fileSizeLimiter = require('./middleware/fileSizeLimiter');
 
+
+////////////////////////// Init app
 const PORT = process.env.PORT || 3000;
 const app = express();
 
+
+
+////////////////////////// Set static folder
 app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'index.html'));
 });
 
+////////////////////////// File upload
 app.post('/upload', fileUpload({ createParentPath: true }),
     filesPayloadExists,
     fileExtLimiter(['.pdf', '.docx', '.txt']),
@@ -34,6 +44,7 @@ app.post('/upload', fileUpload({ createParentPath: true }),
     }
 );
 
+////////////////////////// File download
 app.get('/files', (req, res) => {
     const files = fs.readdirSync(path.join(__dirname, 'files'));
     return res.json({ status: 'success', message: files });
@@ -56,6 +67,7 @@ app.get('/download/:filename', (req, res) => {
     }
 });
 
+////////////////////////// File delete
 app.delete('/delete/:filename', (req, res) => {
     const filename = req.params.filename;
     const filepath = path.join(__dirname, 'files', filename);
@@ -68,4 +80,5 @@ app.delete('/delete/:filename', (req, res) => {
     }
 });
 
+////////////////////////// Error handling
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
