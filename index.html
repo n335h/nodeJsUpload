@@ -5,23 +5,53 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Node.js File Upload</title>
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <style>
+        .delete-button,
+        .download-button {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .delete-button svg,
+        .download-button svg {
+            margin-bottom: 5px;
+        }
+    </style>
 </head>
-<body class="bg-gray-100 h-screen flex items-center justify-center">
-    <div class="max-w-md w-full p-8 bg-white shadow-lg rounded-md">
-        <h1 class="text-2xl font-bold mb-4">Node.js File Upload</h1>
-        <form id="uploadForm" enctype="multipart/form-data" class="mb-4">
-            <label for="myFiles" class="block text-sm font-medium text-gray-600">Select Files:</label>
-            <input type="file" id="myFiles" accept=".pdf, .docx, application/msword, application/vnd.openxmlformats-officedocument.wordprocessingml.document" multiple class="mt-1 p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300">
-            <button type="submit" value="Upload" class="mt-4 p-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 focus:outline-none focus:ring focus:border-blue-300">Upload</button>
-        </form>
-        <h2 class="text-lg font-semibold mb-2">  </h2>
-        <h3 class="text-base text-gray-600"></h3>
+<body class="bg-gray-100">
+    <!-- Upload Section -->
+    <div class="min-h-screen flex items-center justify-center">
+        <div class="max-w-md w-full p-8 bg-white shadow-lg rounded-md">
+            <h1 class="text-2xl font-bold mb-4">Node.js File Upload</h1>
+            <form id="uploadForm" enctype="multipart/form-data" class="mb-4">
+                <label for="myFiles" class="block text-sm font-medium text-gray-600">Select Files:</label>
+                <input type="file" id="myFiles" accept=".pdf, .docx, application/msword, application/vnd.openxmlformats-officedocument.wordprocessingml.document" multiple class="mt-1 p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300">
+                <button type="submit" value="Upload" class="mt-4 p-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 focus:outline-none focus:ring focus:border-blue-300">Upload</button>
+            </form>
+            <div class="flex flex-col items-left">
+                <h2 class="text-lg font-semibold mb-2"></h2>
+                <ul id="fileList" class="text-base text-gray-600 list-none pl-4"></ul>
+            </div>
+        </div>
+    </div>
+    <!-- Current Files Section -->
+    <div class="fixed inset-y-20 left-10 bg-white p-4 max-w-md">
+        <h2 class="text-lg font-semibold mb-2">Current Files in Folder:</h2>
+        <!-- Search Bar -->
+        <input type="text" id="searchBar" placeholder="Search files..." class="p-2 border rounded-md mb-4 focus:outline-none focus:ring focus:border-blue-300">
+        <div class="max-h-500 overflow-y-auto">
+            <ul id="currentFilesList" class="text-base text-gray-600 list-none pl-4"></ul>
+        </div>
     </div>
 
     <script>
         const form = document.getElementById('uploadForm');
+        const fileList = document.getElementById('fileList');
+        const currentFilesList = document.getElementById('currentFilesList');
+        const searchBar = document.getElementById('searchBar');
+
         const sendFiles = async () => {
-            // Object
             const myFiles = document.getElementById('myFiles').files;
             const formData = new FormData();
 
@@ -40,16 +70,68 @@
             const h2 = document.querySelector('h2');
             h2.textContent = `Status: ${json?.status}`;
 
-            const h3 = document.querySelector('h3');
-            h3.textContent = json?.message;
+            const filesList = json?.message;
+            fileList.innerHTML = filesList.map(file => `<li>${file}</li>`).join('');
 
             console.log(json);
         }
 
-        form.addEventListener('submit', (e) => {
+        form.addEventListener('submit', async (e) => {
             e.preventDefault();
-            sendFiles();
+            await sendFiles();
+            await displayCurrentFiles();
         });
+
+        const deleteFile = async (filename) => {
+            const response = await fetch(`http://localhost:3000/delete/${filename}`, {
+                method: 'DELETE',
+            });
+
+            const json = await response.json();
+            console.log(json);
+
+            await displayCurrentFiles();
+        };
+
+        const downloadFile = async (filename) => {
+            window.location.href = `http://localhost:3000/download/${filename}`;
+        };
+
+        const displayCurrentFiles = async () => {
+            const response = await fetch('http://localhost:3000/files');
+            const json = await response.json();
+            const currentFiles = json?.message;
+            console.log(currentFiles);
+            console.log(response)
+
+            // Filter files based on the search bar value
+            const filteredFiles = currentFiles.filter(file => file.toLowerCase().includes(searchBar.value.toLowerCase()));
+
+            currentFilesList.innerHTML = filteredFiles.map(file => `
+                <li class="flex justify-between items-center">
+                    <span>${file}</span>
+                    <div class="flex">
+                        <button onclick="deleteFile('${file}')" class="delete-button ml-2 opacity-50 ">
+                            <svg xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" width="15" height="15" viewBox="0 0 48 48">
+                                <path fill="#F44336" d="M21.5 4.5H26.501V43.5H21.5z" transform="rotate(45.001 24 24)"></path>
+                                <path fill="#F44336" d="M21.5 4.5H26.5V43.501H21.5z" transform="rotate(135.008 24 24)"></path>
+                            </svg>
+                        </button>
+                        <button onclick="downloadFile('${file}')" class="download-button ml-2 opacity-50">
+                            <img https://img.icons8.com/?size=256&id=366&format=png class="w-4 h-4 " src="https://img.icons8.com/?size=96&id=83159&format=png"/>
+                        </button>
+                    </div>
+                </li>
+            `).join('');
+        }
+
+        // Attach an event listener to the search bar for real-time filtering
+        searchBar.addEventListener('input', displayCurrentFiles);
+
+        // Display current files when the page loads
+        window.onload = async () => {
+            await displayCurrentFiles();
+        }
     </script>
 </body>
 </html>

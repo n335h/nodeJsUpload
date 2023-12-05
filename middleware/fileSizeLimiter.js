@@ -14,12 +14,15 @@ Object.keys(files).forEach(key => {
 })
 
 if (filesOverLimit.length) {
-    const properVerb = filesOverLimit.length > 1 ? 'are' : 'is';
+    // if filesOverLimit.length > 1, properVerb = 'are', else properVerb = 'is'
+    const properVerb = filesOverLimit.length > 1 ? 'are' : 'is'; 
 
     const sentence = `Upload failed. ${filesOverLimit.toString()} ${properVerb} over the file size limit of ${MB} MB.`.replaceAll(",", ", ");
 
     const message = filesOverLimit.length < 3
-        ? sentence.replace(",", " and")
+    // if filesOverLimit.length < 3, replace the first comma with 'and'
+        ? sentence.replace(",", " and") 
+    // else replace the last comma with 'and'
         : sentence.replace(/,(?=[^,]*$)/, " and");
 
     return res.status(413).json({ status: "error", message });
@@ -29,4 +32,5 @@ if (filesOverLimit.length) {
     next();
 } 
 
+// export the middleware 
 module.exports = filesSizeLimiter;
