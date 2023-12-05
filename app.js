@@ -48,6 +48,7 @@ app.post('/upload', fileUpload({ createParentPath: true }),
 app.get('/files', (req, res) => {
     const files = fs.readdirSync(path.join(__dirname, 'files'));
     return res.json({ status: 'success', message: files });
+    
 });
 
 app.get('/download/:filename', (req, res) => {
