@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -17,57 +18,119 @@
         .download-button svg {
             margin-bottom: 5px;
         }
-        
+
         #currentFilesList {
-            max-height: 650px; /* Set a maximum height for the list */
-            overflow-y: auto; /* Enable vertical scrollbar if needed */
-        }
-        .navbar {
-    background-color: #3b698f ; /* Black background color */
-        }
-        #submitbutton, #loginButton {
-    background-color: #3b698f ; /* Black background color */
+            max-height: 650px;
+            /* Set a maximum height for the list */
+            overflow-y: auto;
+            /* Enable vertical scrollbar if needed */
         }
 
-        #submitbutton:hover, #loginButton:hover {
-    background-color: rgb(57, 198, 137) ; /* Black background color */
+        .navbar {
+            background-color: #3b698f;
+            /* Black background color */
+        }
+
+        #submitbutton,
+        #loginButton {
+            background-color: #3b698f;
+            /* Black background color */
+        }
+
+        #submitbutton:hover,
+        #loginButton:hover {
+            background-color: rgb(57, 198, 137);
+            /* Black background color */
         }
 
         /* Style the scrollbar track */
-#currentFilesList::-webkit-scrollbar {
-    width: 10px; /* Set the width of the scrollbar */
-}
 
-/* Style the scrollbar thumb */
-#currentFilesList::-webkit-scrollbar-thumb {
-    background-color: #e4e4e4; /* Set the color of the scrollbar thumb */
-    border-radius: 6px; /* Set the border radius of the thumb */
-    
-}
+        #currentFilesList::-webkit-scrollbar, #fileList::-webkit-scrollbar {
+            width: 10px;
+            /* Set the width of the scrollbar */
+        }
 
-/* Style the scrollbar track on hover */
-#currentFilesList::-webkit-scrollbar-track:hover {
-    background-color: #f1f1f1; /* Set the background color on hover */
-}
+        /* Style the scrollbar thumb */
 
-/* Style the scrollbar thumb on hover */
-#currentFilesList::-webkit-scrollbar-thumb:hover {
-    background-color: #b8b8b8; /* Set the color on hover */
-}
+        #currentFilesList::-webkit-scrollbar-thumb, #fileList::-webkit-scrollbar-thumb {
+            background-color: #f8f8f8;
+            /* Set the color of the scrollbar thumb */
+            border-radius: 6px;
+            /* Set the border radius of the thumb */
 
+        }
 
-.upload-animation {
-    color: #b3e0a2; 
-    opacity: 1; 
-    transition: color 0.4s ease, transform 0.4s ease, opacity 0.4s ease;
-}
-.hidden {
+   
+        /* Style the scrollbar thumb on hover */
+
+        #currentFilesList::-webkit-scrollbar-thumb:hover, #fileList::-webkit-scrollbar-thumb:active {
+            background-color: #e6e6e6;
+            /* Set the color on hover */
+        }
+
+        .upload-animation {
+            color: #b3e0a2;
+            opacity: 1;
+            transition: color 0.4s ease, transform 0.4s ease, opacity 0.4s ease;
+        }
+
+        .hidden {
             display: none;
+        }
+        .download-button img {
+            height: auto;
+            width: 20px;
+        }
+
+        @media (max-width: 1000px) {
+            /* Apply styles only when the screen width is 1000px or below */
+            #fileUploadForms {
+                flex-direction: column;
+           
+            }
+      
+
+            .w-1/5 {
+                width: 100%;
+            }
+            .left-panel {
+                margin: 0 auto;
+                margin-bottom: 20px;    
+                margin-top: 20px;
+                width: 90%;
+            }
+            .files {
+                width: 90%;
+                margin: 0 auto;
+            }
+
+
+            .w-4/5 {
+                width: 100%;
+                margin-top: 20px;
+            }
+           /* Text size reduction */
+           .text-sm {
+                font-size: 0.8rem;
+            }
+
+            .text-base {
+                font-size: 0.85rem;
+            }
+
+            .text-lg {
+                font-size: 1rem;
+            }
+
+            .text-xl {
+                font-size: 1.25rem;
+            }
         }
     </style>
 </head>
+
 <body class="bg-gray-100">
-    <nav class="navbar w-full h-10 flex items-center justify-center">
+    <nav class="navbar w-full h-10 shadow-md flex items-center justify-center">
         <!-- Add some content here if needed -->
         <span class="text-white">Navalavley</span>
     </nav>
@@ -78,45 +141,77 @@
             <form>
                 <div class="mb-4">
                     <label for="username" class="block text-sm font-medium text-gray-600">Username:</label>
-                    <input type="text" id="username" name="username" class="mt-1 p-2 border w-full rounded-md focus:outline-none focus:ring focus:border-blue-300">
+                    <input type="text" id="username" name="username"
+                        class="mt-1 p-2 border w-full rounded-md focus:outline-none focus:ring focus:border-blue-300">
                 </div>
                 <div class="mb-4">
                     <label for="password" class="block text-sm font-medium text-gray-600">Password:</label>
-                    <input type="password" id="password" name="password" class="mt-1 p-2 border w-full rounded-md focus:outline-none focus:ring focus:border-blue-300">
+                    <input type="password" id="password" name="password"
+                        class="mt-1 p-2 border w-full rounded-md focus:outline-none focus:ring focus:border-blue-300">
                 </div>
-                <button id="loginButton" onclick="login()" type="button" class="bg-blue-500 text-white p-2 rounded-md hover:bg-blue-600 focus:outline-none focus:ring focus:border-blue-300">Login</button>
+                <button id="loginButton" onclick="login()" type="button"
+                    class="bg-blue-500 text-white p-2 rounded-md hover:bg-blue-600 focus:outline-none focus:ring focus:border-blue-300">Login</button>
             </form>
         </div>
-      
+
     </div>
 
-    <div id="fileUploadForms" class="min-h-100 flex justify-left w-full hidden">
+    <div id="fileUploadForms" class=" flex justify-left w-full hidden">
         <!-- Upload Section -->
-        <div class="w-1/5 p-8 bg-white shadow-lg rounded-md mt-10 mb-20 ml-10 mr-4">
-            <h1 class="text-2xl font-bold mb-4">Node.js File Upload</h1>
+        <div class="left-panel min-h-100 w-1/5 p-8  mb-10 ">
+            <!-- <div class="menu-section h-2/6 p-8 bg-white shadow-lg mt-0 rounded-md mb-5 mr-5">
+                <h2 class="text-lg font-semibold mb-4">Menu</h2>
+                <ul class="text-base text-gray-600 list-none pl-4">
+                    <li class="mb-2"><a href="index.html">Home</a></li>
+                    <li class="mb-2"><a href="about.html">About</a></li>
+                    <li class="mb-2"><a href="contact.html">Contact</a></li>
+                </ul>
+            </div> -->
+            <div class="upload-section h-4/6 p-8 bg-white shadow-lg mr-5">
+                <h2 class="text-lg font-semibold mb-4">Node.js File Upload</h2>
             <form id="uploadForm" enctype="multipart/form-data" class="mb-4">
                 <label for="myFiles" class="block text-sm font-medium text-gray-600">Select Files:</label>
-                <input type="file" id="myFiles" accept=".pdf, .docx, application/msword, application/vnd.openxmlformats-officedocument.wordprocessingml.document" 
-                multiple class="mt-1 p-2 border w-full rounded-md focus:outline-none focus:ring focus:border-blue-300">
-                <button id="submitbutton" type="submit" value="Upload" class="mt-4 p-2  text-white rounded-md hover:bg-blue-600 focus:outline-none focus:ring focus:border-blue-300">Upload</button>
+                <input type="file" id="myFiles"
+                    accept=".pdf, .docx, application/msword, application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+                    multiple
+                    class="mt-1 p-2 border w-full rounded-md focus:outline-none focus:ring focus:border-blue-300">
+                <button id="submitbutton" type="submit" value="Upload"
+                    class="mt-4 p-2  text-white rounded-md hover:bg-blue-600 focus:outline-none focus:ring focus:border-blue-300">Upload</button>
             </form>
             <div class="flex flex-col items-left">
                 <h2 class="text-lg font-semibold mb-2"></h2>
-                <ul id="fileList" class="text-base text-gray-600 list-none pl-4"></ul>
+                <ul id="fileList" class="text-base  text-gray-600 list-none pl-4  overflow-y-auto max-h-32"></ul>
             </div>
         </div>
 
+        </div>
+
         <!-- Current Files Section -->
-        <div class="w-4/5 p-8 bg-white shadow-lg rounded-md mt-10 mb-20 mr-10">
+        <div class=" files w-4/5 p-8 bg-white shadow-lg rounded-md mt-10  mr-5">
             <h2 class="text-lg font-semibold mb-2">Current Files in Folder:</h2>
             <!-- Search Bar -->
-            <input type="text" id="searchBar" placeholder="Search files..." class="p-2 border w-96 rounded-md mb-4 focus:outline-none focus:ring focus:border-blue-300 mr-4">
-            <label for="sortDropdown" class="mr-2">Sort By:</label>
+            <div class="flex justify-between items-center mb-4">
+                <span class="flex justify-center items-center">
+            <input type="text" id="searchBar" placeholder="Search files..."
+                class="p-2 border w-96 rounded-md mb-4 focus:outline-none focus:ring focus:border-blue-300 mr-4">
+     <label for="sortDropdown" class="mr-2">Sort By:</label>
             <select id="sortDropdown" class="p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300">
                 <option value="alphabetical">Alphabetical</option>
                 <option value="uploadDate">Upload Date</option>
             </select>
-            <button id="deleteSelectedButton" onclick="deleteSelectedFiles()" class="bg-red-500 text-white p-2 rounded-md hover:bg-red-600 focus:outline-none focus:ring focus:border-red-300">Delete Selected</button>
+        </span>
+     <span class="flex">
+                <button onclick="deleteSelectedFiles()" class="delete-button ml-2 mr-1">
+                    <svg xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" width="15" height="15" viewBox="0 0 48 48">
+                        <path fill="#F44336" d="M21.5 4.5H26.501V43.5H21.5z" transform="rotate(45.001 24 24)"></path>
+                        <path fill="#F44336" d="M21.5 4.5H26.5V43.501H21.5z" transform="rotate(135.008 24 24)"></path>
+                    </svg>
+                </button>
+                <button onclick="downloadSelectedFiles()" class="download-button ml-2 mr-1">
+              <img src="https://cdn-icons-png.flaticon.com/512/4208/4208397.png"/>
+                </button>
+            </span>
+            </div>
 
             <div id="currentFilesList" class="text-base text-gray-600 list-none pl-4 overflow-y-auto max-h-600"></div>
         </div>
@@ -124,196 +219,183 @@
 
 
     <script>
-const form = document.getElementById('uploadForm');
-const fileList = document.getElementById('fileList');
-const currentFilesList = document.getElementById('currentFilesList');
-const searchBar = document.getElementById('searchBar');
-const sortDropdown = document.getElementById('sortDropdown');
-const loginScreen = document.getElementById('loginScreen');
-const fileUploadForms = document.getElementById('fileUploadForms');
+        const form = document.getElementById('uploadForm');
+        const fileList = document.getElementById('fileList');
+        const currentFilesList = document.getElementById('currentFilesList');
+        const searchBar = document.getElementById('searchBar');
+        const sortDropdown = document.getElementById('sortDropdown');
+        const loginScreen = document.getElementById('loginScreen');
+        const fileUploadForms = document.getElementById('fileUploadForms');
 
-let currentSort = 'alphabetical'; // Default sorting method
+        let currentSort = 'alphabetical'; // Default sorting method
 
-function login() {
-            // Simulate login logic
+        function login() {
             const isLoggedIn = true; // Replace with your actual authentication check
 
             if (isLoggedIn) {
-                // If logged in, hide the login screen and show the file upload forms
                 loginScreen.classList.add('hidden');
                 fileUploadForms.classList.remove('hidden');
             }
         }
-// Update fileList when files are selected
-document.getElementById('myFiles').addEventListener('change', () => {
-    const myFiles = document.getElementById('myFiles').files;
-    fileList.innerHTML = Array.from(myFiles).map(file => `<li>${file.name}</li>`).join('');
-});
-const sendFiles = async () => {
-    // Add a class to fileList to trigger the animation
-    fileList.classList.add('upload-animation');
 
-    const myFiles = document.getElementById('myFiles').files;
-    const uploadingSymbol = '<span class="loading-symbol">Uploading...</span>';
-
-    fileList.innerHTML = Array.from(myFiles).map(file => `<li>${file.name} ${uploadingSymbol}</li>`).join('');
-
-    const formData = new FormData();
-
-    Object.keys(myFiles).forEach(key => {
-        formData.append(myFiles.item(key).name, myFiles.item(key));
-    });
-
-    try {
-        const response = await fetch('http://localhost:3000/upload', {
-            method: 'POST',
-            body: formData
+        document.getElementById('myFiles').addEventListener('change', () => {
+            const myFiles = document.getElementById('myFiles').files;
+            fileList.innerHTML = Array.from(myFiles).map(file => `<li>${file.name}</li>`).join('');
         });
 
-        const json = await response.json();
-        console.log(json);
+        const sendFiles = async () => {
+            fileList.classList.add('upload-animation');
 
-        const h2 = document.querySelector('h2');
-        h2.textContent = `Status: ${json?.status}`;
+            const myFiles = document.getElementById('myFiles').files;
+            const uploadingSymbol = '<span class="loading-symbol">Uploading...</span>';
 
-        // Display the list of selected files in the fileList element
-        const filesList = json?.message;
-        fileList.innerHTML = filesList.map(file => `<li>${file}</li>`).join('');
+            fileList.innerHTML = Array.from(myFiles).map(file => `<li>${file.name} ${uploadingSymbol}</li>`).join('');
 
-        // Remove the animation class after a delay (2 second in this example)
-        setTimeout(() => {
-            fileList.classList.remove('upload-animation');
-        }, 2000);
+            const formData = new FormData();
 
-        console.log(json);
-    } catch (error) {
-        console.error('Error during file upload:', error);
-        // Handle error and update UI accordingly
-        fileList.innerHTML = Array.from(myFiles).map(file => `<li>${file.name} - Upload failed</li>`).join('');
-    }
-};
+            Object.keys(myFiles).forEach(key => {
+                formData.append(myFiles.item(key).name, myFiles.item(key));
+            });
 
-form.addEventListener('submit', async (e) => {
-    e.preventDefault();
-    await sendFiles();
-    await displayCurrentFiles();
-});
+            try {
+                const response = await fetch('http://localhost:3000/upload', {
+                    method: 'POST',
+                    body: formData
+                });
 
-function ConfirmDelete()
-{
-  return confirm("Are you sure you want to delete?");
-}
+                const json = await response.json();
+                console.log(json);
 
+                const h2 = document.querySelector('h2');
+                h2.textContent = `Status: ${json?.status}`;
 
+                const filesList = json?.message;
+                fileList.innerHTML = filesList.map(file => `<li>${file}</li>`).join('');
 
+                setTimeout(() => {
+                    fileList.classList.remove('upload-animation');
+                }, 2000);
+
+                console.log(json);
+            } catch (error) {
+                console.error('Error during file upload:', error);
+                fileList.innerHTML = Array.from(myFiles).map(file => `<li>${file.name} - Upload failed</li>`).join('');
+            }
+        };
+
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            await sendFiles();
+            await displayCurrentFiles();
+        });
+
+        function ConfirmDelete() {
+            return confirm("Are you sure you want to delete?");
+        }
 
         const deleteFile = async (filename) => {
-            ConfirmDelete();
-            
+            if (ConfirmDelete()) {
+                const response = await fetch(`http://localhost:3000/delete/${filename}`, {
+                    method: 'DELETE',
+                });
 
-            const response = await fetch(`http://localhost:3000/delete/${filename}`, {
-                method: 'DELETE',
-            });
-            
+                const json = await response.json();
+                console.log(json);
 
-            const json = await response.json();
-            console.log(json);
-
-            await displayCurrentFiles();
+                await displayCurrentFiles();
+            }
         };
 
         const downloadFile = async (filename) => {
             window.location.href = `http://localhost:3000/download/${filename}`;
         };
 
-        function deleteSelectedFiles() {
-        const selectedCheckboxes = document.querySelectorAll('.file-checkbox:checked');
-        const selectedFileNames = Array.from(selectedCheckboxes).map(checkbox => checkbox.dataset.filename);
+        function downloadSelectedFiles() {
+            const selectedCheckboxes = document.querySelectorAll('.file-checkbox:checked');
+            const selectedFileNames = Array.from(selectedCheckboxes).map(checkbox => checkbox.dataset.filename);
 
-        if (selectedFileNames.length > 0) {
-            // Confirm deletion
-            if (confirm(`Are you sure you want to delete ${selectedFileNames.length} selected file(s)?`)) {
-                // Delete selected files
+            if (selectedFileNames.length > 0) {
                 selectedFileNames.forEach(async (filename) => {
-                    await deleteFile(filename);
+                    await downloadFile(filename);
                 });
+            } else {
+                alert('Please select at least one file to download.');
             }
-        } else {
-            alert('Please select at least one file to delete.');
         }
-    }
+
+        function deleteSelectedFiles() {
+            const selectedCheckboxes = document.querySelectorAll('.file-checkbox:checked');
+            const selectedFileNames = Array.from(selectedCheckboxes).map(checkbox => checkbox.dataset.filename);
+
+            if (selectedFileNames.length > 0) {
+                if (confirm(`Are you sure you want to delete ${selectedFileNames.length} selected file(s)?`)) {
+                    selectedFileNames.forEach(async (filename) => {
+                        await deleteFile(filename);
+                    });
+                }
+            } else {
+                alert('Please select at least one file to delete.');
+            }
+        }
 
         const displayCurrentFiles = async () => {
-        const response = await fetch('http://localhost:3000/files');
-        const json = await response.json();
-        console.log(json);
-        let currentFiles = json?.message || [];
+            const response = await fetch('http://localhost:3000/files');
+            const json = await response.json();
+            console.log(json);
+            let currentFiles = json?.message || [];
 
-        // Filter files based on the search bar value
-        const filteredFiles = currentFiles.filter(file => file.toLowerCase().includes(searchBar.value.toLowerCase()));
+            const filteredFiles = currentFiles.filter(file => file.toLowerCase().includes(searchBar.value.toLowerCase()));
 
-        // Sort files based on the current sorting method
-        if (currentSort === 'alphabetical') {
-            filteredFiles.sort();
-        } else if (currentSort === 'uploadDate') {
-            // Assuming the files are objects with a timestamp property
-            filteredFiles.sort((a, b) => {
-                // Replace this with your timestamp property
-                const timestampA = Date.parse(a.timestamp);
-                const timestampB = Date.parse(b.timestamp);
+            if (currentSort === 'alphabetical') {
+                filteredFiles.sort();
+            } else if (currentSort === 'uploadDate') {
+                filteredFiles.sort((a, b) => {
+                    const timestampA = Date.parse(a.timestamp);
+                    const timestampB = Date.parse(b.timestamp);
+                    return timestampB - timestampA;
+                });
+            }
 
-                return timestampB - timestampA; // Sort in descending order
-            });
+            const headerRow = `
+                <div class="header-container">
+                    <div class="flex sticky justify-between items-center font-bold text-gray-800">
+                        <span class="w-2/3">Filename</span>
+                        <span class="w-1/3">Date Added</span>
+                    </div>
+                    <hr class="my-2 mr-4 border-t border-gray-200">
+            `;
+
+            currentFilesList.innerHTML = headerRow + filteredFiles.map(file => `
+                <div class="flex justify-between items-center">
+                    <input type="checkbox" class="file-checkbox mr-4" data-filename="${file}" />
+                    <span class="w-2/3">${file}</span>
+                    <span class="w-1/3">${file.timestamp || 'N/A'}</span>
+                    <div class="flex">
+                        <button onclick="deleteFile('${file}')" class="delete-button ml-2 mr-2">
+                            <svg xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" width="15" height="15" viewBox="0 0 48 48">
+                                <path fill="#F44336" d="M21.5 4.5H26.501V43.5H21.5z" transform="rotate(45.001 24 24)"></path>
+                                <path fill="#F44336" d="M21.5 4.5H26.5V43.501H21.5z" transform="rotate(135.008 24 24)"></path>
+                            </svg>
+                        </button>
+                        <button onclick="downloadFile('${file}')" class="download-button ml-2 mr-4">
+                           <img src="https://cdn-icons-png.flaticon.com/512/4208/4208397.png"
+                        </button>
+                    </div>
+                </div>
+                <hr class="my-2 mr-4 border-t border-gray-200">
+            `).join('');
         }
 
-        const headerRow = `
-            <!-- Add a container for the header and scrollable content -->
-            <div class="header-container">
-                <!-- Header Row -->
-                <div class="flex sticky justify-between items-center font-bold text-gray-800">
-                    <span class="w-2/3">Filename</span>
-                    <span class="w-1/3">Date Added</span>
-                </div>
-                <hr class="my-2 mr-4 border-t border-gray-300">
-        `;
-
-        currentFilesList.innerHTML = headerRow + filteredFiles.map(file => `
-            <div class="flex justify-between items-center">
-                <input type="checkbox" class="file-checkbox mr-4" data-filename="${file}" />
-                <span class="w-2/3">${file}</span>
-                <span class="w-1/3">${file.timestamp || 'N/A'}</span>
-                <div class="flex">
-                    <button onclick="deleteFile('${file}')" class="delete-button ml-2 mr-2">
-                        <svg xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" width="15" height="15" viewBox="0 0 48 48">
-                            <path fill="#F44336" d="M21.5 4.5H26.501V43.5H21.5z" transform="rotate(45.001 24 24)"></path>
-                            <path fill="#F44336" d="M21.5 4.5H26.5V43.501H21.5z" transform="rotate(135.008 24 24)"></path>
-                        </svg>
-                    </button>
-                    <button onclick="downloadFile('${file}')" class="download-button ml-2 mr-4">
-                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="15" height="15" fill="#58ACED">
-                            <path d="M0 0h24v24H0z" fill="none"/>
-                            <path d="M3 4h4v5h5V4h4v6h5v5h1v8H2v-8h1v-5h5V4zm2 2v7h9V6H5zm2 2h5V7H7v1zm0 2h5V9H7v1zm0 2h5v-1H7v1zm0 2h5v-1H7v1zm0 2h5v-1H7v1z"/>
-                        </svg>
-                    </button>
-                </div>
-            </div>
-            <hr class="my-2 mr-4 border-t border-gray-300">
-        `).join('');
-    }
-
-        // Attach event listeners
         searchBar.addEventListener('input', displayCurrentFiles);
-     
-
         sortDropdown.addEventListener('change', () => {
             currentSort = sortDropdown.value;
             displayCurrentFiles();
         });
 
-        // Display current files when the page loads
         window.onload = async () => {
             await displayCurrentFiles();
         }
     </script>
 </body>
+
 </html>
