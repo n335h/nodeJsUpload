@@ -23,47 +23,35 @@
 
         #currentFilesList {
             max-height: 650px;
-            /* Set a maximum height for the list */
             overflow-y: auto;
-            /* Enable vertical scrollbar if needed */
         }
 
         .navbar {
             background-color: #3b698f;
-            /* Black background color */
         }
 
         #submitbutton,
         #loginButton {
             background-color: #3b698f;
-            /* Black background color */
         }
 
         #submitbutton:hover,
         #loginButton:hover {
             background-color: rgb(57, 198, 137);
-            /* Black background color */
         }
-
-        /* Style the scrollbar track */
 
         #currentFilesList::-webkit-scrollbar, #fileList::-webkit-scrollbar {
             width: 10px;
-            /* Set the width of the scrollbar */
         }
-
-        /* Style the scrollbar thumb */
 
         #currentFilesList::-webkit-scrollbar-thumb, #fileList::-webkit-scrollbar-thumb {
             background-color: #f8f8f8;
-            /* Set the color of the scrollbar thumb */
             border-radius: 6px;
-            /* Set the border radius of the thumb */
+
 
         }
 
-   
-        /* Style the scrollbar thumb on hover */
+
 
         #currentFilesList::-webkit-scrollbar-thumb:hover, #fileList::-webkit-scrollbar-thumb:active {
             background-color: #e6e6e6;
@@ -85,7 +73,7 @@
         }
 
         @media (max-width: 1000px) {
-            /* Apply styles only when the screen width is 1000px or below */
+        
             #fileUploadForms {
                 flex-direction: column;
            
@@ -127,7 +115,7 @@
 
 <body class="bg-slate-200">
     <nav class="navbar w-full h-10 shadow-md flex items-center justify-center">
-        <!-- Add some content here if needed -->
+       
         <span class="text-white">Navalavley</span>
     </nav>
 
@@ -283,7 +271,7 @@
         setTimeout(() => {
     fileList.classList.remove('upload-animation');
 
-    // Remove the uploaded files from the list
+    ////////////////////// Remove the uploaded files from the list
     Array.from(myFiles).forEach(file => {
         const uploadedFileElement = Array.from(fileList.children).find(li => li.textContent.includes(file.name));
         if (uploadedFileElement) {
@@ -291,7 +279,7 @@
         }
     });
 
-    // Reset the value of the file input to clear the selection
+    /////////////////////// Reset the value of the file input to clear the selection
     document.getElementById('myFiles').value = '';
 
     }, 2000);
