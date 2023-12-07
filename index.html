@@ -6,6 +6,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Node.js File Upload</title>
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+
+
     <style>
         .delete-button,
         .download-button {
@@ -90,9 +92,7 @@
             }
       
 
-            .w-1/5 {
-                width: 100%;
-            }
+         
             .left-panel {
                 margin: 0 auto;
                 margin-bottom: 20px;    
@@ -105,10 +105,6 @@
             }
 
 
-            .w-4/5 {
-                width: 100%;
-                margin-top: 20px;
-            }
            /* Text size reduction */
            .text-sm {
                 font-size: 0.8rem;
@@ -129,12 +125,13 @@
     </style>
 </head>
 
-<body class="bg-gray-100">
+<body class="bg-slate-200">
     <nav class="navbar w-full h-10 shadow-md flex items-center justify-center">
         <!-- Add some content here if needed -->
         <span class="text-white">Navalavley</span>
     </nav>
 
+<!-- Login Screen -->    
     <div id="loginScreen" class="min-h-100 flex justify-center items-center mt-60">
         <div class="bg-white p-8 rounded shadow-md w-96">
             <h1 class="text-2xl font-bold mb-4">Login</h1>
@@ -155,7 +152,7 @@
         </div>
 
     </div>
-
+<!-- File Upload and File Browse -->
     <div id="fileUploadForms" class=" flex justify-left w-full hidden">
         <!-- Upload Section -->
         <div class="left-panel min-h-100 w-1/5 p-8  mb-10 ">
@@ -167,7 +164,7 @@
                     <li class="mb-2"><a href="contact.html">Contact</a></li>
                 </ul>
             </div> -->
-            <div class="upload-section h-4/6 p-8 bg-white shadow-lg mr-5">
+            <div class="upload-section min-h-full h-4/6 p-8 bg-white shadow-lg mr-5 ml-10">
                 <h2 class="text-lg font-semibold mb-4">Node.js File Upload</h2>
             <form id="uploadForm" enctype="multipart/form-data" class="mb-4">
                 <label for="myFiles" class="block text-sm font-medium text-gray-600">Select Files:</label>
@@ -180,14 +177,14 @@
             </form>
             <div class="flex flex-col items-left">
                 <h2 class="text-lg font-semibold mb-2"></h2>
-                <ul id="fileList" class="text-base  text-gray-600 list-none pl-4  overflow-y-auto max-h-32"></ul>
+                <ul id="fileList" class="text-base  text-gray-600 list-none pl-4  overflow-y-auto max-h-60"></ul>
             </div>
         </div>
 
         </div>
 
-        <!-- Current Files Section -->
-        <div class=" files w-4/5 p-8 bg-white shadow-lg rounded-md mt-10  mr-5">
+<!-- Current Files Section -->
+        <div class=" files w-4/5 p-8 bg-white shadow-lg rounded-md mt-10  mr-10">
             <h2 class="text-lg font-semibold mb-2">Current Files in Folder:</h2>
             <!-- Search Bar -->
             <div class="flex justify-between items-center mb-4">
@@ -200,7 +197,9 @@
                 <option value="uploadDate">Upload Date</option>
             </select>
         </span>
+        <button onClick="createNewFolder()" class="bg-blue-500 text-white p-2 rounded-md hover:bg-blue-600 focus:outline-none focus:ring focus:border-blue-300">Create New Folder</button>
      <span class="flex">
+    
                 <button onclick="deleteSelectedFiles()" class="delete-button ml-2 mr-1">
                     <svg xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" width="15" height="15" viewBox="0 0 48 48">
                         <path fill="#F44336" d="M21.5 4.5H26.501V43.5H21.5z" transform="rotate(45.001 24 24)"></path>
@@ -210,6 +209,7 @@
                 <button onclick="downloadSelectedFiles()" class="download-button ml-2 mr-1">
               <img src="https://cdn-icons-png.flaticon.com/512/4208/4208397.png"/>
                 </button>
+
             </span>
             </div>
 
@@ -217,6 +217,7 @@
         </div>
     </div>
 
+    
 
     <script>
         const form = document.getElementById('uploadForm');
@@ -229,6 +230,7 @@
 
         let currentSort = 'alphabetical'; // Default sorting method
 
+///////////////Dummy Login
         function login() {
             const isLoggedIn = true; // Replace with your actual authentication check
 
@@ -238,56 +240,100 @@
             }
         }
 
+/////////////// File Upload
+
         document.getElementById('myFiles').addEventListener('change', () => {
             const myFiles = document.getElementById('myFiles').files;
             fileList.innerHTML = Array.from(myFiles).map(file => `<li>${file.name}</li>`).join('');
         });
 
+/////////////// Send Files        
+
         const sendFiles = async () => {
-            fileList.classList.add('upload-animation');
+    fileList.classList.add('upload-animation');
 
-            const myFiles = document.getElementById('myFiles').files;
-            const uploadingSymbol = '<span class="loading-symbol">Uploading...</span>';
+    const myFiles = document.getElementById('myFiles').files;
+    const uploadingSymbol = '<span class="loading-symbol">Uploading...</span>';
 
-            fileList.innerHTML = Array.from(myFiles).map(file => `<li>${file.name} ${uploadingSymbol}</li>`).join('');
+    fileList.innerHTML = Array.from(myFiles).map(file => `<li>${file.name} ${uploadingSymbol}</li>`).join('');
 
-            const formData = new FormData();
+    const formData = new FormData();
 
-            Object.keys(myFiles).forEach(key => {
-                formData.append(myFiles.item(key).name, myFiles.item(key));
-            });
+    Object.keys(myFiles).forEach(key => {
+        formData.append(myFiles.item(key).name, myFiles.item(key));
+    });
 
-            try {
-                const response = await fetch('http://localhost:3000/upload', {
-                    method: 'POST',
-                    body: formData
-                });
+    try {
+        const response = await fetch('http://localhost:3000/upload', {
+            method: 'POST',
+            body: formData
+        });
 
-                const json = await response.json();
-                console.log(json);
+        const json = await response.json();
+        console.log(json);
 
-                const h2 = document.querySelector('h2');
-                h2.textContent = `Status: ${json?.status}`;
+        const h2 = document.querySelector('h2');
+        h2.textContent = `Status: ${json?.status}`;
 
-                const filesList = json?.message;
-                fileList.innerHTML = filesList.map(file => `<li>${file}</li>`).join('');
+        const filesList = json?.message;
+        fileList.innerHTML = filesList.map(file => `<li>${file}</li>`).join('');
 
-                setTimeout(() => {
-                    fileList.classList.remove('upload-animation');
-                }, 2000);
 
-                console.log(json);
-            } catch (error) {
-                console.error('Error during file upload:', error);
-                fileList.innerHTML = Array.from(myFiles).map(file => `<li>${file.name} - Upload failed</li>`).join('');
-            }
-        };
+    
+        setTimeout(() => {
+    fileList.classList.remove('upload-animation');
 
+    // Remove the uploaded files from the list
+    Array.from(myFiles).forEach(file => {
+        const uploadedFileElement = Array.from(fileList.children).find(li => li.textContent.includes(file.name));
+        if (uploadedFileElement) {
+            uploadedFileElement.remove();
+        }
+    });
+
+    // Reset the value of the file input to clear the selection
+    document.getElementById('myFiles').value = '';
+
+    }, 2000);
+        console.log(json);
+    } catch (error) {
+        console.error('Error during file upload:', error);
+        fileList.innerHTML = Array.from(myFiles).map(file => `<li>${file.name} - Upload failed</li>`).join('');
+    }
+    };
+
+       
         form.addEventListener('submit', async (e) => {
             e.preventDefault();
             await sendFiles();
             await displayCurrentFiles();
         });
+
+
+
+/////////////////// Create New Folder
+
+function createNewFolder() {
+  const folderName = prompt("Please enter a folder name", "New Folder");
+  
+  if (folderName !== null) {
+    const response = fetch('http://localhost:3000/create-folder', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ folderName }),
+    })
+    .then(response => response.json())
+    .then(data => {
+      console.log(data.message);
+      displayCurrentFiles(); // Assuming this function displays the current files
+    })
+    .catch(error => console.error('Error:', error));
+  }
+}
+
+///////////////// File Delete
 
         function ConfirmDelete() {
             return confirm("Are you sure you want to delete?");
@@ -306,91 +352,255 @@
             }
         };
 
-        const downloadFile = async (filename) => {
-            window.location.href = `http://localhost:3000/download/${filename}`;
-        };
+///////////////// Delete Selected Files
 
-        function downloadSelectedFiles() {
-            const selectedCheckboxes = document.querySelectorAll('.file-checkbox:checked');
-            const selectedFileNames = Array.from(selectedCheckboxes).map(checkbox => checkbox.dataset.filename);
-
-            if (selectedFileNames.length > 0) {
-                selectedFileNames.forEach(async (filename) => {
-                    await downloadFile(filename);
-                });
-            } else {
-                alert('Please select at least one file to download.');
-            }
-        }
-
-        function deleteSelectedFiles() {
-            const selectedCheckboxes = document.querySelectorAll('.file-checkbox:checked');
-            const selectedFileNames = Array.from(selectedCheckboxes).map(checkbox => checkbox.dataset.filename);
-
-            if (selectedFileNames.length > 0) {
-                if (confirm(`Are you sure you want to delete ${selectedFileNames.length} selected file(s)?`)) {
-                    selectedFileNames.forEach(async (filename) => {
-                        await deleteFile(filename);
+        const deleteSelectedFile = async (filename) => {
+            const response = await fetch(`http://localhost:3000/delete/${filename}`, {
+                method: 'DELETE',
                     });
-                }
-            } else {
-                alert('Please select at least one file to delete.');
-            }
+
+    /// seperate logic for delete selected files as utilising deleteFile left a loop of delete confirmation popup for each file
+
+    const json = await response.json();
+    console.log(json);
+};
+
+function deleteSelectedFiles() {
+    const selectedCheckboxes = document.querySelectorAll('.file-checkbox:checked');
+    const selectedFileNames = Array.from(selectedCheckboxes).map(checkbox => checkbox.dataset.filename);
+
+    if (selectedFileNames.length > 0) {
+        if (confirm(`Are you sure you want to delete ${selectedFileNames.length} selected file(s)?`)) {
+            selectedFileNames.forEach(async (filename) => {
+                await deleteSelectedFile(filename);
+            });
+
+            // Refresh the display after all files are deleted
+            displayCurrentFiles();
+        }
+    } else {
+        alert('Please select at least one file to delete.');
+    }
+}
+
+///////////////// File Download
+
+        const downloadFile = async (filename) => {
+    try {
+        const response = await fetch(`http://localhost:3000/download/${filename}`);
+        if (!response.ok) {
+            throw new Error(`Failed to download file: ${filename}`);
+        }
+        const blob = await response.blob();
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = filename;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+    } catch (error) {
+        console.error(`Error downloading file ${filename}:`, error);
+        throw error;
+    }
+};
+///////////////// Download Selected Files
+
+function downloadSelectedFiles() {
+    const selectedCheckboxes = document.querySelectorAll('.file-checkbox:checked');
+    const selectedFileNames = Array.from(selectedCheckboxes).map(checkbox => checkbox.dataset.filename);
+
+    if (selectedFileNames.length > 0) {
+        // Use a Promise.all to wait for all downloadFile to complete
+        Promise.all(selectedFileNames.map(filename => downloadFile(filename)))
+            .then(() => {
+                // All downloads completed successfully
+
+                // Unchecking the checkboxes for the downloaded files
+                selectedCheckboxes.forEach(checkbox => {
+                    checkbox.checked = false;
+                });
+
+                console.log('All files downloaded successfully');
+            })
+            .catch(error => {
+                // Handle any errors that occurred during the downloads
+                console.error('Error downloading files:', error);
+            });
+    } else {
+        alert('Please select at least one file to download.');
+    }
+}
+
+
+
+
+    
+
+///////////////// Display Current Files      
+
+const displayCurrentFiles = async () => {
+        const response = await fetch('http://localhost:3000/files');
+        const json = await response.json();
+        console.log(json);
+        let currentFiles = json?.message || [];
+
+        const filteredFiles = currentFiles.filter(file => file.toLowerCase().includes(searchBar.value.toLowerCase()));
+
+        if (currentSort === 'alphabetical') {
+            filteredFiles.sort();
+        } else if (currentSort === 'uploadDate') {
+            filteredFiles.sort((a, b) => {
+                const timestampA = Date.parse(a.timestamp);
+                const timestampB = Date.parse(b.timestamp);
+                return timestampB - timestampA;
+            });
         }
 
-        const displayCurrentFiles = async () => {
-            const response = await fetch('http://localhost:3000/files');
-            const json = await response.json();
-            console.log(json);
-            let currentFiles = json?.message || [];
 
-            const filteredFiles = currentFiles.filter(file => file.toLowerCase().includes(searchBar.value.toLowerCase()));
+///////////////// Display
 
-            if (currentSort === 'alphabetical') {
-                filteredFiles.sort();
-            } else if (currentSort === 'uploadDate') {
-                filteredFiles.sort((a, b) => {
-                    const timestampA = Date.parse(a.timestamp);
-                    const timestampB = Date.parse(b.timestamp);
-                    return timestampB - timestampA;
-                });
-            }
-
-            const headerRow = `
-                <div class="header-container">
-                    <div class="flex sticky justify-between items-center font-bold text-gray-800">
-                        <span class="w-2/3">Filename</span>
-                        <span class="w-1/3">Date Added</span>
-                    </div>
-                    <hr class="my-2 mr-4 border-t border-gray-200">
-            `;
-
-            currentFilesList.innerHTML = headerRow + filteredFiles.map(file => `
-                <div class="flex justify-between items-center">
-                    <input type="checkbox" class="file-checkbox mr-4" data-filename="${file}" />
-                    <span class="w-2/3">${file}</span>
-                    <span class="w-1/3">${file.timestamp || 'N/A'}</span>
-                    <div class="flex">
-                        <button onclick="deleteFile('${file}')" class="delete-button ml-2 mr-2">
-                            <svg xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" width="15" height="15" viewBox="0 0 48 48">
-                                <path fill="#F44336" d="M21.5 4.5H26.501V43.5H21.5z" transform="rotate(45.001 24 24)"></path>
-                                <path fill="#F44336" d="M21.5 4.5H26.5V43.501H21.5z" transform="rotate(135.008 24 24)"></path>
-                            </svg>
-                        </button>
-                        <button onclick="downloadFile('${file}')" class="download-button ml-2 mr-4">
-                           <img src="https://cdn-icons-png.flaticon.com/512/4208/4208397.png"
-                        </button>
-                    </div>
+const headerRow = `
+            <div class="header-container">
+                <div class="flex sticky justify-between items-center font-bold text-gray-800">
+                    <span class="w-2/3">Filename</span>
+                    <span class="w-1/3">Date Added</span>
                 </div>
                 <hr class="my-2 mr-4 border-t border-gray-200">
-            `).join('');
-        }
+        `;
+        currentFilesList.innerHTML = headerRow + filteredFiles.map(file => `
+            <div class="flex justify-between items-center">
+                <span class="flex w-5/6 items-center">
+                <input type="checkbox" class="file-checkbox h-2.5 w-2.5 mr-4" data-filename="${file}" />
+                <span class=" flex w-2/3">
+                    ${isFolder(file) ? '<img src="https://img.icons8.com/?size=256&id=66828&format=png" alt="Folder" class="icon h-5 w-5 mr-2">' : '<img src="https://img.icons8.com/?size=256&id=qqACFoTWsxHZ&format=png" alt="File" class="icon h-5 w-5 mr-2">'}${file}
+                    <button onclick="renameFileOrFolder('${file}')" class="rename-button ml-2 mr-4">
+            <img class='h-2 w-2' src="https://cdn-icons-png.flaticon.com/512/1159/1159633.png"/>
+                </button>
+                    </span>
+     
+                ${file.timestamp || 'N/A'}
+      
+</span>
+
+                <div class="flex w-1/6">
+            
+                    <button onclick="deleteFile('${file}')" class="delete-button ml-2 mr-2">
+                        <svg xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" width="15" height="15" viewBox="0 0 48 48">
+                            <path fill="#F44336" d="M21.5 4.5H26.501V43.5H21.5z" transform="rotate(45.001 24 24)"></path>
+                            <path fill="#F44336" d="M21.5 4.5H26.5V43.501H21.5z" transform="rotate(135.008 24 24)"></path>
+                        </svg>
+                    </button>
+                    <button onclick="downloadFile('${file}')" class="download-button ml-2 mr-4">
+                        <img src="https://cdn-icons-png.flaticon.com/512/4208/4208397.png"/>
+                    </button>
+                </div>
+            </div>
+            <hr class="my-2 mr-4 border-t border-gray-200">
+        `).join('');
+    }
+
+//////////////////////////// Is Folder?
+    const isFolder = (item) => {
+        // You can customize this logic based on how you identify folders on the server
+        // For now, let's assume that items with a "." in their name are files, and others are folders
+        return !item.includes('.');
+    }
+
+///////////////// Event Listeners for Search Bar and Sort Dropdown
 
         searchBar.addEventListener('input', displayCurrentFiles);
         sortDropdown.addEventListener('change', () => {
             currentSort = sortDropdown.value;
             displayCurrentFiles();
         });
+
+
+        //////////////////////////// Rename File or Folder
+        function renameFileOrFolder(name) {
+    const newName = prompt(`Enter a new name for ${name}`, name);
+    
+    if (newName !== null) {
+        const isFolder = name.includes('.');
+        
+        if (isFolder) {
+            renameFolder(name, newName);
+        } else {
+            renameFile(name, newName);
+        }
+    }
+}
+
+
+///////////////// Double click logic for opening folder or downloading file
+
+        currentFilesList.addEventListener('dblclick', (e) => {
+            const filename = e.target.textContent;
+            const isFolder = filename.includes('Folder');
+
+            if (isFolder) {
+                // If the user double-clicked on a folder, display the files in that folder
+                displayCurrentFiles(filename);
+            } else {
+                // If the user double-clicked on a file, download that file
+                downloadFile(filename);
+            }
+        });
+
+///////////////// Rename File or Folder
+
+async function renameFile(oldName, newName) {
+    try {
+        const response = await fetch(`http://localhost:3000/rename/${oldName}`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ newFilename: newName }),
+        });
+
+        const json = await response.json();
+        console.log(json);
+
+        await displayCurrentFiles();
+    } catch (error) {
+        console.error(`Error renaming file ${oldName}:`, error);
+    }
+}
+
+async function renameFolder(oldName, newName) {
+    try {
+        const response = await fetch(`http://localhost:3000/rename-folder/${oldName}`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ newFolderName: newName }),
+        });
+
+        const json = await response.json();
+        console.log(json);
+
+        await displayCurrentFiles();
+    } catch (error) {
+        console.error(`Error renaming folder ${oldName}:`, error);
+    }
+}
+
+function renameSelectedFiles() {
+    const selectedCheckboxes = document.querySelectorAll('.file-checkbox:checked');
+    const selectedFileNames = Array.from(selectedCheckboxes).map(checkbox => checkbox.dataset.filename);
+
+    if (selectedFileNames.length === 1) {
+        // If only one file is selected, prompt for the new name
+        const oldName = selectedFileNames[0];
+        renameFileOrFolder(oldName);
+    } else {
+        alert('Please select exactly one file or folder to rename.');
+    }
+}
+
+///////////////// Display Current Files on Page Load
 
         window.onload = async () => {
             await displayCurrentFiles();
