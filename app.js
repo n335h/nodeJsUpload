@@ -1,5 +1,3 @@
-
-
 ////////////////////////// Import modules
 const express = require('express');
 const fileUpload = require('express-fileupload');
@@ -270,6 +268,36 @@ app.put(
 				status: 'error',
 				message: `Folder ${folderName} not found`,
 			});
+		}
+	}
+);
+
+////////////////////////// File preview
+app.get(
+	'/preview/:filename',
+	async (req, res) => {
+		try {
+			const filename = req.params.filename;
+			const filePath = path.join(
+				__dirname,
+				'files',
+				filename
+			); // Adjust the folder path
+
+			console.log(filePath);
+			console.log(fs.existsSync(filePath));
+
+			// Read the content of the file
+			const fileContent = fs.readFileSync(
+				filePath,
+				'utf-8'
+			);
+
+			// Send the content as the response
+			res.send(fileContent);
+		} catch (error) {
+			console.error('Error reading file:', error);
+			res.status(500).send('Error reading file');
 		}
 	}
 );
