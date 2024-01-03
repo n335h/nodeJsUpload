@@ -154,15 +154,17 @@
             </div> -->
             <div class="upload-section min-h-full h-4/6 p-8 bg-white shadow-lg mr-5 ml-10">
                 <h2 class="text-lg font-semibold mb-4">Node.js File Upload</h2>
-            <form id="uploadForm" enctype="multipart/form-data" class="mb-4">
-                <label for="myFiles" class="block text-sm font-medium text-gray-600">Select Files:</label>
-                <input type="file" id="myFiles"
-                    accept=".pdf, .docx, application/msword, application/vnd.openxmlformats-officedocument.wordprocessingml.document"
-                    multiple
-                    class="mt-1 p-2 border w-full rounded-md focus:outline-none focus:ring focus:border-blue-300">
-                <button id="submitbutton" type="submit" value="Upload"
-                    class="mt-4 p-2  text-white rounded-md hover:bg-blue-600 focus:outline-none focus:ring focus:border-blue-300">Upload</button>
-            </form>
+                <form ref='uploadForm' id="uploadForm" enctype="multipart/form-data" class="mb-4" action="/upload" method="POST">
+                    <label for="myFiles" class="block text-sm font-medium text-gray-600">Select Files:</label>
+                    <input type="file" id="myFiles"
+                    name="currentFolderPath"
+                        accept=".pdf, .docx, application/msword, application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+                        multiple
+                        class="mt-1 p-2 border w-full rounded-md focus:outline-none focus:ring focus:border-blue-300">
+                    <input type="hidden" name="currentFolderPath" id="currentFolderPathInput" value="${currentFolderPath}">
+                    <button id="submitbutton" type="submit"
+                        class="mt-4 p-2  text-white rounded-md hover:bg-blue-600 focus:outline-none focus:ring focus:border-blue-300">Upload</button>
+                </form>
             <div class="flex flex-col items-left">
                 <h2 class="text-lg font-semibold mb-2"></h2>
                 <ul id="fileList" class="text-base  text-gray-600 list-none pl-4  overflow-y-auto max-h-60"></ul>
@@ -231,19 +233,37 @@
 
         
 //////////////////////////// Is Folder?
-    const isFolder = (item) => {
+const isFolder = (item) => {
+    return !item.includes('.');
+};
 
-return !item.includes('.');
+
+////////////////////// File Type 
+
+function getFileIcon(file) {
+    const fileExtension = file.split('.').pop().toLowerCase();
+
+    // Define icons for specific file extensions
+    const iconMapping = {
+        'pdf': 'https://img.icons8.com/?size=256&id=13417&format=png', 
+        'docx': 'https://img.icons8.com/?size=256&id=13624&format=png', 
+        'txt': 'https://img.icons8.com/?size=256&id=2290&format=png', 
+       
+    };
+
+    // Default to a generic file icon if the extension is not found
+    const defaultIcon = 'https://img.icons8.com/?size=256&id=qqACFoTWsxHZ&format=png';
+
+    return `<img src="${iconMapping[fileExtension] || defaultIcon}" alt="${fileExtension}" class="icon h-5 w-5 mr-2">`;
 }
 
 
-////////////////////// Handle Item click
 
+////////////////////// Handle Item click
 const handleItemClick = async (name, isFolder) => {
     if (isFolder) {
         try {
-            const response = await fetch(`http://localhost:3000/files/${encodeURIComponent(currentFolderPath + name)}`);
-
+            const response = await fetch(`http://localhost:3000/files/${encodeURIComponent(currentFolderPath)}`);
             if (!response.ok) {
                 throw new Error(`Failed to fetch folder contents: ${name}`);
             }
@@ -251,47 +271,58 @@ const handleItemClick = async (name, isFolder) => {
             const data = await response.json();
 
             // Update currentFolderPath
-            currentFolderPath = `${currentFolderPath}${name}/`;
-            console.log(currentFolderPath);
-            console.log(data);
-            console.log(response)
-          
+            currentFolderPath = decodeURIComponent(`${currentFolderPath}${name}/`);
 
-            // Update displayed files
+            // Display files in the new current folder path
             await displayCurrentFiles();
             console.log(displayCurrentFiles);
-            console.log('Displaying current files')
         } catch (error) {
             console.error(`Error fetching folder contents ${name}:`, error);
         }
-    } else {
-        // If the item is a file, preview it
-        previewFile(name);
+    
     }
 };
 
+// const previewFile = async (filename) => {
+//     try {
+//     const response = await fetch(`http://localhost:3000/files/${encodeURIComponent(filename)}`);
+//     console.log(response);
 
-const previewFile = async (filename) => {
-    try {
-    const response = await fetch(`http://localhost:3000/files/${encodeURIComponent(filename)}`);
-    console.log(response);
+//     if (!response.ok) {
+//       throw new Error(`Failed to fetch file: ${filename}. Status: ${response.status}`);
+//     }
 
-    if (!response.ok) {
-      throw new Error(`Failed to fetch file: ${filename}. Status: ${response.status}`);
+
+//     const fileContent = await response.text();
+    
+//     // Display the file content in the overlay/modal
+//     document.getElementById('filePreviewContent').innerText = fileContent;
+
+//     // Show the overlay/modal
+//     document.getElementById('filePreviewOverlay').classList.remove('hidden');
+//   } catch (error) {
+//     console.error(`Error previewing file ${filename}:`, error);
+//     alert(`Error previewing file ${filename}: ${error.message}`);
+//   }
+// };
+
+// Function to navigate back to the previous folder
+const navigateBack = async () => {
+    // Check if the currentFolderPath is already at the root level
+    if (currentFolderPath === '/') {
+        alert('Already at the root level.');
+        return;
     }
 
+    // Remove the last folder from the currentFolderPath
+    const folders = currentFolderPath.split('/').filter(Boolean); // Remove empty strings
+    folders.pop(); // Remove the last folder
 
-    const fileContent = await response.text();
-    
-    // Display the file content in the overlay/modal
-    document.getElementById('filePreviewContent').innerText = fileContent;
+    // Construct the new currentFolderPath
+    currentFolderPath = `/${folders.join('/')}`;
 
-    // Show the overlay/modal
-    document.getElementById('filePreviewOverlay').classList.remove('hidden');
-  } catch (error) {
-    console.error(`Error previewing file ${filename}:`, error);
-    alert(`Error previewing file ${filename}: ${error.message}`);
-  }
+    // Display files in the new current folder path
+    await displayCurrentFiles();
 };
 
 /////////////// File Upload
@@ -305,6 +336,8 @@ const previewFile = async (filename) => {
 
         const sendFiles = async () => {
     fileList.classList.add('upload-animation');
+    const currentFolderPathInput = document.getElementById('currentFolderPathInput');
+currentFolderPathInput.value = currentFolderPath;
 
     const myFiles = document.getElementById('myFiles').files;
     const uploadingSymbol = '<span class="loading-symbol">Uploading...</span>';
@@ -313,8 +346,10 @@ const previewFile = async (filename) => {
 
     const formData = new FormData();
 
+    console.log('Current Folder Path:', currentFolderPath);
     Object.keys(myFiles).forEach(key => {
-        formData.append(myFiles.item(key).name, myFiles.item(key));
+        // Append the file to the form data with the folder path
+        formData.append(`${currentFolderPath}${myFiles.item(key).name}`, myFiles.item(key));
     });
 
     try {
@@ -368,25 +403,24 @@ const previewFile = async (filename) => {
 /////////////////// Create New Folder
 
 function createNewFolder() {
-  const folderName = prompt("Please enter a folder name", "New Folder");
-  
-  if (folderName !== null) {
-    const response = fetch('http://localhost:3000/create-folder', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ folderName }),
-    })
-    .then(response => response.json())
-    .then(data => {
-      console.log(data.message);
-      displayCurrentFiles(); // Assuming this function displays the current files
-    })
-    .catch(error => console.error('Error:', error));
-  }
-}
+    const folderName = prompt("Please enter a folder name", "New Folder");
 
+    if (folderName !== null) {
+        const response = fetch('http://localhost:3000/create-folder', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ folderName, currentFolderPath }),
+        })
+        .then(response => response.json())
+        .then(data => {
+            console.log(data.message);
+            displayCurrentFiles(); // Assuming this function displays the current files
+        })
+        .catch(error => console.error('Error:', error));
+    }
+}
 ///////////////// File Delete
 
         function ConfirmDelete() {
@@ -493,20 +527,34 @@ function downloadSelectedFiles() {
     
 
 ///////////////// Display Current Files      
-
 const displayCurrentFiles = async () => {
     try {
-        const response = await fetch(`http://localhost:3000/files${currentFolderPath}`);
+
+        console.log('Fetching files from server...');
+        console.log('Before fetch, currentFolderPath:', currentFolderPath);
+        
+
+      const response = await fetch(`http://localhost:3000/files${currentFolderPath}`);
         const json = await response.json();
-        console.log(json);
-        console.log(response);
-        console.log(currentFolderPath);
-        console.log('Displaying current files try')
 
+        console.log('Server Response:', json);
+        console.log('After fetch, currentFolderPath:', currentFolderPath);
 
-        let currentFiles = json?.message || [];
+        let currentFiles = [];
+
+        // Check the structure of the JSON response
+        if (json.message) {
+            // If JSON.message exists, use it
+            currentFiles = json.message || [];
+        } else if (json.files) {
+            // If JSON.files exists, use it
+            currentFiles = json.files || [];
+        }
+
+        console.log('Current Files:', currentFiles);
 
         const filteredFiles = currentFiles.filter(file => file.toLowerCase().includes(searchBar.value.toLowerCase()));
+
 
         if (currentSort === 'alphabetical') {
             filteredFiles.sort();
@@ -518,10 +566,18 @@ const displayCurrentFiles = async () => {
             });
         }
 
-///////////////// Display
+        const currentFilesListContainer = document.getElementById('currentFilesList');
+        
+        // Debug: Log the filteredFiles array
+        console.log('Filtered Files:', filteredFiles);
 
-const headerRow = `
+        // Debug: Log the HTML being generated
+        const generatedHTML = filteredFiles.map(file => `...`).join('');
+        console.log('Generated HTML:', generatedHTML);
+
+        const headerRow = `
             <div class="header-container">
+                     <button id="backButton" onclick="navigateBack()">Back</button>
                 <div class="flex sticky justify-between items-center font-bold text-gray-800">
                     <span class="w-2/3">Filename</span>
                     <span class="w-1/3">Date Added</span>
@@ -529,17 +585,22 @@ const headerRow = `
                 <hr class="my-2 mr-4 border-t border-gray-200">
             </div>
         `;
-        currentFilesList.innerHTML = headerRow + filteredFiles.map(file => `
-            <div class="flex justify-between items-center">
+
+        // Display header and files
+        const filesHTML = filteredFiles.map(file => `
+            <div class="currentFilesList flex justify-between items-center">
+           
                 <span class="flex w-5/6 items-center">
-                    <input type="checkbox" class="file-checkbox h-2.5 w-2.5 mr-4" data-filename="${file}" />
-                    <span class="flex w-2/3" onclick="handleItemClick('${file}', ${isFolder(file)})">
-                        ${isFolder(file) ? '<img src="https://img.icons8.com/?size=256&id=67363&format=png" alt="Folder" class="icon h-5 w-5 mr-2">' : '<img src="https://img.icons8.com/?size=256&id=qqACFoTWsxHZ&format=png" alt="File" class="icon h-5 w-5 mr-2">'}
-                        ${file}
-                        <button onclick="renameFileOrFolder('${file}')" class="rename-button ml-2 mr-4">
-                            <img class='h-2 w-2' src="https://cdn-icons-png.flaticon.com/512/1159/1159633.png"/>
-                        </button>
-                    </span>
+    <input type="checkbox" class="file-checkbox h-2.5 w-2.5 mr-4" data-filename="${file}" />
+    <span class="flex w-2/3" onclick="handleItemClick('${file}', ${isFolder(file)})">
+        ${isFolder(file) ? '<img src="https://img.icons8.com/?size=256&id=12160&format=png" alt="Folder" class="icon h-5 w-5 mr-2">' : getFileIcon(file)}
+        ${file}
+        <button onclick="renameFileOrFolder('${file}')" class="rename-button ml-2 mr-4">
+            <img class='h-2 w-2' src="https://cdn-icons-png.flaticon.com/512/1159/1159633.png"/>
+        </button>
+    </span>
+</span>
+
                 </span>
                 <div class="flex w-1/6">
                     <button onclick="deleteFile('${file}')" class="delete-button ml-2 mr-2">
@@ -555,11 +616,13 @@ const headerRow = `
             </div>
             <hr class="my-2 mr-4 border-t border-gray-200">
         `).join('');
+
+        currentFilesListContainer.innerHTML = headerRow + filesHTML;
+
     } catch (error) {
         console.error(`Error displaying current files: ${error}`);
     }
 };
-
 ///////////////// Event Listeners for Search Bar and Sort Dropdown
 
         searchBar.addEventListener('input', displayCurrentFiles);
@@ -570,9 +633,9 @@ const headerRow = `
 
 
 //////////////////////////// Rename File or Folder
-        function renameFileOrFolder(name) {
+function renameFileOrFolder(name) {
     const newName = prompt(`Enter a new name for ${name}`, name);
-    
+
     if (newName !== null) {
         const isFolder = name.includes('.');
         
@@ -591,32 +654,27 @@ function getFileExtension(fileName) {
 }
 
 ///////////////// Rename File or Folder
+async function renameFile(filename, newFilename) {
+  try {
+    const response = await fetch(`http://localhost:3000/rename/${filename}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ newFilename }),
+    });
 
-async function renameFile(oldName, newName) {
-    try {
-        const extension = getFileExtension(oldName);
-
-        const response = await fetch(`http://localhost:3000/rename/${oldName}`, {
-            method: 'PUT',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ newFilename: newName }),
-        });
-
-        const json = await response.json();
-        console.log(json);
-
-        // Reapply the extension to the new name
-        const newFileNameWithExtension = `${newName}.${extension}`;
-        
-        await displayCurrentFiles();
-    } catch (error) {
-        console.error(`Error renaming file ${oldName}:`, error);
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(`Failed to rename file: ${errorData.message}`);
     }
+
+    const responseData = await response.json();
+    console.log(responseData.message);
+  } catch (error) {
+    console.error('Error renaming file:', error);
+  }
 }
-
-
 
 async function renameFolder(oldName, newName) {
     try {
@@ -636,6 +694,7 @@ async function renameFolder(oldName, newName) {
         console.error(`Error renaming folder ${oldName}:`, error);
     }
 }
+
 
 function renameSelectedFiles() {
     const selectedCheckboxes = document.querySelectorAll('.file-checkbox:checked');

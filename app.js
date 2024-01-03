@@ -4,6 +4,7 @@ const fileUpload = require('express-fileupload');
 const path = require('path');
 const fs = require('fs');
 const bodyParser = require('body-parser');
+const { promisify } = require('util');
 
 ////////////////////////// Init app
 const PORT = process.env.PORT || 3000;
@@ -27,9 +28,35 @@ app.get('/', (req, res) => {
 	);
 });
 
+///////////////////////////// Get current file/ folder paddingRight:
+app.get('/current-folder', (req, res) => {
+	const currentFolderPath = req.query.path || '/';
+	const folderPath = path.join(
+		__dirname,
+		'files',
+		currentFolderPath
+	);
+
+	if (!fs.existsSync(folderPath)) {
+		return res.status(404).json({
+			status: 'error',
+			message: `Folder ${currentFolderPath} not found`,
+		});
+	}
+
+	const files = fs.readdirSync(folderPath);
+
+	return res.json({
+		status: 'success',
+		folder: currentFolderPath,
+		files: files,
+	});
+});
 ///////////////////////////// Create a new folder
 app.post('/create-folder', (req, res) => {
 	const folderName = req.body.folderName;
+	const currentFolderPath =
+		req.body.currentFolderPath || '/';
 
 	if (!folderName) {
 		return res.status(400).json({
@@ -41,6 +68,7 @@ app.post('/create-folder', (req, res) => {
 	const folderPath = path.join(
 		__dirname,
 		'files',
+		currentFolderPath,
 		folderName
 	);
 
@@ -90,26 +118,36 @@ app.post(
 	filesPayloadExists,
 	fileExtLimiter(['.pdf', '.docx', '.txt']),
 	fileSizeLimiter,
-	(req, res) => {
+	async (req, res) => {
 		const files = req.files;
+
+		// Get the current folder path from the request body
+		const currentFolderPath =
+			req.body.currentFolderPath || '/'; //
+
 		console.log(files);
 
-		const fileNames = Object.keys(files).map(
-			(key) => {
+		const fileNames = await Promise.all(
+			Object.keys(files).map(async (key) => {
 				const filepath = path.join(
 					__dirname,
 					'files',
+					currentFolderPath,
 					files[key].name
 				);
-				files[key].mv(filepath, (err) => {
-					if (err)
-						return res.status(500).json({
-							status: 'error',
-							message: err,
-						});
-				});
-				return files[key].name;
-			}
+
+				// Use promisify to make `mv` function return a promise
+				const mvAsync = promisify(files[key].mv);
+
+				try {
+					await mvAsync(filepath);
+					return files[key].name;
+				} catch (error) {
+					throw new Error(
+						`Error moving file: ${error}`
+					);
+				}
+			})
 		);
 
 		return res.json({
@@ -118,7 +156,6 @@ app.post(
 		});
 	}
 );
-
 ////////////////////////// File download
 app.get('/files', (req, res) => {
 	const files = fs.readdirSync(
@@ -130,32 +167,40 @@ app.get('/files', (req, res) => {
 	});
 });
 
-app.get('/download/:filename', (req, res) => {
-	const filename = req.params.filename;
-	const filepath = path.join(
-		__dirname,
-		'files',
-		filename
-	);
+app.get(
+	'/download/:folderName/:filename',
+	(req, res) => {
+		const folderName = req.params.folderName;
+		const filename = req.params.filename;
+		const folderPath = path.join(
+			__dirname,
+			'files',
+			folderName
+		);
+		const filePath = path.join(
+			folderPath,
+			filename
+		);
 
-	// Check if the file exists
-	if (fs.existsSync(filepath)) {
-		// Provide the file for download
-		res.download(filepath, filename, (err) => {
-			if (err) {
-				return res.status(500).json({
-					status: 'error',
-					message: 'Error downloading file',
-				});
-			}
-		});
-	} else {
-		return res.status(404).json({
-			status: 'error',
-			message: `File ${filename} not found`,
-		});
+		// Check if the file exists
+		if (fs.existsSync(filePath)) {
+			// Provide the file for download
+			res.download(filePath, filename, (err) => {
+				if (err) {
+					return res.status(500).json({
+						status: 'error',
+						message: 'Error downloading file',
+					});
+				}
+			});
+		} else {
+			return res.status(404).json({
+				status: 'error',
+				message: `File ${filename} not found in folder ${folderName}`,
+			});
+		}
 	}
-});
+);
 
 ////////////////////////// File delete
 app.delete('/delete/:filename', (req, res) => {
@@ -254,6 +299,7 @@ app.put(
 		const newFolderPath = path.join(
 			__dirname,
 			'files',
+			req.body.currentFolderPath || '',
 			newFolderName
 		);
 
